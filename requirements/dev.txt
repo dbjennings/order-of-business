@@ -1,0 +1,6 @@
+-r base.txt
+black
+bandit
+flake8
+isort
+mypy
