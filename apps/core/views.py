@@ -24,6 +24,7 @@ class CoreRegisterView(CreateView):
 
         # Check for redirect and authenticated user
         if self.redirect_authenticated_user and self.request.user.is_authenticated:
+            
             # Redirect to the user's home page
             redirect_to = reverse_lazy('landing')
             return HttpResponseRedirect(redirect_to)
