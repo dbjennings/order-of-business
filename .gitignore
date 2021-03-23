@@ -145,3 +145,6 @@ Thumbs.db #thumbnail cache on Windows
 
 # VSCode
 .vscode/
+
+# Migrations
+migrations/*auto

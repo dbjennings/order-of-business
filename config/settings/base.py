@@ -1,7 +1,6 @@
 import environ
 from django.urls import reverse_lazy
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 ROOT_DIR = environ.Path(__file__) - 3
 BASE_DIR = ROOT_DIR.path('apps')
@@ -45,8 +44,8 @@ THIRD_PARTY_APPS = (
 )
 
 LOCAL_APPS = (
-    'apps.core',
-    'apps.oob',
+    'apps.core.apps.CoreConfig',
+    'apps.oob.apps.OobConfig',
 )
 
 # Installed apps as a sum of its parts
