@@ -1,0 +1,25 @@
+<table>
+    <tr>
+        <th>Project Name</th>
+        <th>Description</th>
+        <th># of Tasks</th>
+        <th>Parent Project</th>
+        <th>Created By</th>
+        <th>Completed On</th>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for project in projects %}
+    <tr>
+        <td>{{ project.title }}</td>
+        <td>{{ project.body }}</td>
+        <td>{{ project.tasks|length }}</td>
+        <td>{{ project.parent }}</td>
+        <td>{{ project.user }}</td>
+        <td>{{ project.completed_on|default_if_none:'Incomplete' }}</td>
+        <td><a href="{% url 'project-update' project.pk %}">Update</a></td>
+        <td><a href="{% url 'project-delete' project.pk %}">Delete</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'project-create' %}">Create New Project</a>

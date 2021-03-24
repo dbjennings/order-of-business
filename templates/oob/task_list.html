@@ -1,0 +1,32 @@
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>User</th>
+        <th>PK</th>
+        <th>Created On</th>
+        <th>Completed?</th>
+        <th>Edit Link</th>
+        <th>Delete Link</th>
+    </tr>
+    {% for task in tasks %}
+    <tr>
+        <td><a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a></td>
+        <td>{{ task.body }}</td>
+        <td>{{ task.user }}</td>
+        <td>{{ task.pk }}</td>
+        <td>{{ task.created_on|date:"D d M Y" }}</td>
+        <td>
+            <form id="complete{{ forloop.counter }}" method="POST" action="{% url 'task-complete' task.pk %}">
+                {% csrf_token %}
+                <a href="javascript:{}" onclick="document.getElementById('complete{{ forloop.counter }}').submit();">
+                    {{ task.completed_on|default_if_none:"False" }}</a>
+            </form>
+        </td>
+        <td><a href="{% url 'task-update' task.pk %}">Edit</a></td>
+        <td><a href="{% url 'task-delete' task.pk %}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'task-create' %}">Create Task</a>

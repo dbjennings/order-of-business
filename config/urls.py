@@ -7,4 +7,5 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='core/landing.html'), name='landing'),
     path('admin/', admin.site.urls),
     path('user/', include('apps.core.urls')),
+    path('oob/', include('apps.oob.urls')),
 ]

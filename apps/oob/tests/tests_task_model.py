@@ -45,3 +45,9 @@ class TaskModelTest(TestCase):
         modified_date = old_task.modified_on
 
         self.assertNotEqual(initial_date, modified_date)
+
+    def test_task_completion_date_not_future(self):
+        tomorrow = timezone.now() + timedelta(days=1)
+        with self.assertRaises(ValueError):
+            self.task.completed_on = tomorrow
+            self.task.save()

@@ -1,0 +1,7 @@
+<h1>{{ task.title }}</h1>
+<h3>{{ task.body }}</h3>
+<p>Project: {{ task.project }}</p>
+<p>Created By: {{ task.user }}</p>
+<p>Created On: {{ task.created_on }}</p>
+<p>Last Modified On: {{ task.modified_on }}</p>
+<p>Completion Date: {{ task.completed_on|default_if_none:"Not Completed" }}</p>
