@@ -17,9 +17,6 @@ class CoreUserManager(BaseUserManager):
         user.set_password(password)
 
         user.save(using=self._db)
-
-        user_group = Group.objects.get(name='User')
-        user.groups.add(user_group)
         
         return user
 
