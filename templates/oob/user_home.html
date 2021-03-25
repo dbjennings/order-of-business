@@ -1,4 +1,12 @@
 <h1>Welcome back, {{ request.user.email }}!</h1>
 <span><a href="{% url 'task-index' %}">Tasks</a>: {{ tasks|length }}</span>
-<br>
+<br/>
 <span><a href="{% url 'project-index' %}">Projects</a>: {{ projects|length }}</span>
+{% for group in request.user.groups.all %}
+<p>{{ group.name }}</p>
+{% endfor %}
+<form method="GET" action="{% url 'search' %}">
+    {% csrf_token %}
+    {{ search_form.query }}
+    <button type="submit">Search</button>
+</form>

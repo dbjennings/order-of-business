@@ -3,10 +3,11 @@ from django.urls.conf import include
 
 from apps.oob.views import TaskIndexView, TaskDetailView, TaskCreateView, TaskUpdateView, TaskDeleteView
 from apps.oob.views import ProjectUpdateView, ProjectCreateView, ProjectDetailView, ProjectIndexView, ProjectDeleteView
-from apps.oob.views import UserHomeView
+from apps.oob.views import UserHomeView, UserSearchView
 
 urlpatterns = [
     path('', UserHomeView.as_view(), name='user-home'),
+    path('search/', UserSearchView.as_view(), name='search'),
     path('task/', include([
         path('', TaskIndexView.as_view(), name='task-index'),
         path('inbox', TaskIndexView.as_view(inbox_view=True), name='inbox'),

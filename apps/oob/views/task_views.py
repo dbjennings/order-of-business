@@ -1,7 +1,12 @@
+from django.http.response import HttpResponseRedirect
+from apps.oob.forms.task_forms import TaskCreateForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.utils import timezone
 from django.urls import reverse_lazy
 
 from ..models import Task
+from ..mixins import UserIsObjectUserMixIn
 
 class TaskIndexView(ListView):
     model = Task
@@ -19,17 +24,25 @@ class TaskIndexView(ListView):
             return Task.objects.filter(user=self.request.user)
 
 
-class TaskDetailView(DetailView):
+class TaskDetailView(UserIsObjectUserMixIn, DetailView):
     model = Task
     context_object_name = 'task'
     template_name = 'oob/task_detail.html'
 
+    def test_func(self):
+        object = self.get_object()
+        print(object.user)
+        return object.user == self.request.user
+
 
 class TaskCreateView(CreateView):
-    model = Task
-    fields = ('title','body','project',)
+    form_class = TaskCreateForm
     template_name = 'oob/task_create.html'
     success_url = reverse_lazy('task-index')
+
+    def get_form(self):
+        '''Retrieves the form with the current user'''
+        return self.form_class(self.request.user, **self.get_form_kwargs())
 
     def form_valid(self, form):
         '''Sets the form user to the current user before saving'''
@@ -38,7 +51,7 @@ class TaskCreateView(CreateView):
         # Pass the updated form to CreateView.form_valid
         return super(TaskCreateView, self).form_valid(form)
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(UserIsObjectUserMixIn, UpdateView):
     model = Task
     fields = ('title','body','project','completed_on')
     template_name = 'oob/task_update.html'
@@ -46,7 +59,21 @@ class TaskUpdateView(UpdateView):
     # Extra Parameters
     complete_toggle = False
 
-class TaskDeleteView(DeleteView):
+    def post(self, request, *args, **kwargs):
+        if self.complete_toggle:
+            toggle_task = Task.objects.get(pk=self.kwargs['pk'])
+
+            if toggle_task.is_complete:
+                toggle_task.completed_on = None
+            else:
+                toggle_task.completed_on = timezone.now()
+            
+            toggle_task.save()
+            return HttpResponseRedirect(self.success_url)
+    
+        return super().post(request, *args, **kwargs)
+
+class TaskDeleteView(UserIsObjectUserMixIn, DeleteView):
     model = Task
     template_name = 'oob/task_delete.html'
     success_url = reverse_lazy('task-index')

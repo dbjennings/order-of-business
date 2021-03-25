@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import Group
 from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
@@ -14,7 +15,11 @@ class CoreUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, date_joined=timezone.now(), **extra_fields)
         user.set_password(password)
+
         user.save(using=self._db)
+
+        user_group = Group.objects.get(name='User')
+        user.groups.add(user_group)
         
         return user
 

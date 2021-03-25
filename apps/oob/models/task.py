@@ -15,6 +15,10 @@ class Task(models.Model):
     modified_on = models.DateTimeField(auto_now=True, editable=False)
     completed_on = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def is_complete(self):
+        return self.completed_on is not None
+
     def clean(self):
         '''Custom field validation'''
         # Title must be non-empty
