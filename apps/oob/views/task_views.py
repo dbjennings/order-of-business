@@ -36,7 +36,7 @@ class TaskCreateView(CreateView):
         # Set the form instance user field
         form.instance.user = self.request.user
         # Pass the updated form to CreateView.form_valid
-        return super().form_valid(form)
+        return super(TaskCreateView, self).form_valid(form)
 
 class TaskUpdateView(UpdateView):
     model = Task

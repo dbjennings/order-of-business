@@ -1,0 +1,15 @@
+<h1>Project: {{ project.title }}</h1>
+<h2 style="color: #777;">{{ project.body }}</h2>
+<br>
+<h3>Top Level Tasks<h3>
+{% for task in project.tasks.all %}
+<p>{{ task.title }}</p>
+{% endfor %}
+<br>
+{% for child in project.children.all %}
+<h3>Sub-Project:{{ child.title }}</h3>
+{% for task in child.tasks.all %}
+<p>{{ task.title }}</p>
+{% endfor %}
+<br>
+{% endfor %}

@@ -20,9 +20,13 @@ class Task(models.Model):
         # Title must be non-empty
         if self.title=='':
             raise ValidationError('Task titles must have a non-empty value')
+            
         # Tasks can only be added to projects owned by the same user
-        if self.project and self.user is not self.project.user:
-                raise ValidationError('Tasks can only be added to projects owned by the same user')
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # if self.project is not None:
+        #     if self.user != getattr(self.project, 'user'):
+        #         raise ValidationError('Tasks can only be added to projects owned by the same user')
+
         # Tasks can't be completed with a future date
         if self.completed_on and self.completed_on > timezone.now():
             raise ValueError('Tasks cannot be completed beyond timezone.now()')
@@ -34,14 +38,6 @@ class Task(models.Model):
         self.full_clean()
         
         return super(Task,self).save(*args, **kwargs)
-
-    def complete_toggle_now(self):
-        if self.completed_on:
-            self.completed_on = None
-        else:
-            self.completed_on = timezone.now()
-
-        return self.save()
 
     def __str__(self):
         return self.title
