@@ -6,20 +6,6 @@ from .models import CoreUser
 
 
 class CoreUserAddForm(UserCreationForm):
-    email = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
-    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
-    password1 = forms.CharField(
-        label=_("Password"),
-        strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'form-control'}),
-    )
-    password2 = forms.CharField(
-        label=_("Password confirmation"),
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'form-control'}),
-        strip=False,
-    )
 
     class Meta(UserCreationForm.Meta):
         model = CoreUser
@@ -30,7 +16,7 @@ class CoreUserChangeForm(UserChangeForm):
 
     class Meta(UserChangeForm.Meta):
         model = CoreUser
-        fields = ('email',)
+        fields = ('email','name',)
 
 
 class CoreAuthenticationForm(AuthenticationForm):

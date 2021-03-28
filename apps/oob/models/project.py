@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 class Project(models.Model):
     title = models.CharField(max_length=100, blank=False)
@@ -11,11 +12,12 @@ class Project(models.Model):
     modified_on = models.DateTimeField(auto_now=True, editable=False)
     completed_on = models.DateTimeField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('project-detail', kwargs={"pk": self.pk})
 
     def clean(self) -> None:
         '''Custom field validation prior to saving'''
 
-        # Title must be non-empty
         if self.title=='':
             raise ValidationError('Projects title must have a non-empty value')
         # A project can't be its own parent

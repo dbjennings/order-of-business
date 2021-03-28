@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.urls import reverse
 
 from .project import Project
 
@@ -15,33 +16,38 @@ class Task(models.Model):
     modified_on = models.DateTimeField(auto_now=True, editable=False)
     completed_on = models.DateTimeField(null=True, blank=True)
 
+
     @property
     def is_complete(self):
         return self.completed_on is not None
+    
+
+    def get_absolute_url(self):
+        return reverse('task-detail', kwargs={"pk": self.pk})
+    
 
     def clean(self):
-        '''Custom field validation'''
-        # Title must be non-empty
+        '''Custom field validation at the model level'''
+
         if self.title=='':
             raise ValidationError('Task titles must have a non-empty value')
-            
-        # Tasks can only be added to projects owned by the same user
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # if self.project is not None:
-        #     if self.user != getattr(self.project, 'user'):
+        
+        # project = self.project
+        # if project is not None:
+        #     if project.user is not self.user:
         #         raise ValidationError('Tasks can only be added to projects owned by the same user')
 
-        # Tasks can't be completed with a future date
         if self.completed_on and self.completed_on > timezone.now():
-            raise ValueError('Tasks cannot be completed beyond timezone.now()')
+            raise ValueError('Tasks cannot be completed with a future date')
         
         return super(Task, self).clean()
+
 
     def save(self, *args, **kwargs):
         '''Performs field validation before saving'''
         self.full_clean()
-        
         return super(Task,self).save(*args, **kwargs)
+
 
     def __str__(self):
         return self.title

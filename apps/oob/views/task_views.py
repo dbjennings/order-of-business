@@ -1,14 +1,15 @@
 from django.http.response import HttpResponseRedirect
 from apps.oob.forms.task_forms import TaskCreateForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.urls import reverse_lazy
 
 from ..models import Task
 from ..mixins import UserIsObjectUserMixIn
 
-class TaskIndexView(ListView):
+
+class TaskIndexView(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'tasks'
     template_name = 'oob/task_list.html'
@@ -24,18 +25,17 @@ class TaskIndexView(ListView):
             return Task.objects.filter(user=self.request.user)
 
 
-class TaskDetailView(UserIsObjectUserMixIn, DetailView):
+class TaskDetailView(LoginRequiredMixin, UserIsObjectUserMixIn, DetailView):
     model = Task
     context_object_name = 'task'
     template_name = 'oob/task_detail.html'
 
     def test_func(self):
         object = self.get_object()
-        print(object.user)
         return object.user == self.request.user
 
 
-class TaskCreateView(CreateView):
+class TaskCreateView(LoginRequiredMixin, CreateView):
     form_class = TaskCreateForm
     template_name = 'oob/task_create.html'
     success_url = reverse_lazy('task-index')
@@ -50,6 +50,7 @@ class TaskCreateView(CreateView):
         form.instance.user = self.request.user
         # Pass the updated form to CreateView.form_valid
         return super(TaskCreateView, self).form_valid(form)
+
 
 class TaskUpdateView(UserIsObjectUserMixIn, UpdateView):
     model = Task
@@ -72,6 +73,7 @@ class TaskUpdateView(UserIsObjectUserMixIn, UpdateView):
             return HttpResponseRedirect(self.success_url)
     
         return super().post(request, *args, **kwargs)
+
 
 class TaskDeleteView(UserIsObjectUserMixIn, DeleteView):
     model = Task

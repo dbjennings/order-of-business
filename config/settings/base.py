@@ -7,7 +7,7 @@ BASE_DIR = ROOT_DIR.path('apps')
 
 # Customized Authentication Constants
 AUTH_USER_MODEL = 'core.coreuser'
-LOGIN_URL = '/login'
+LOGIN_URL = reverse_lazy('login')
 LOGIN_REDIRECT_URL = reverse_lazy('landing')
 LOGOUT_REDIRECT_URL = '/'
 HOME_URL = '/home'

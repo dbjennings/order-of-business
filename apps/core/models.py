@@ -8,11 +8,15 @@ from .managers import CoreUserManager
 class CoreUser(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    name = models.CharField(max_length=100)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = CoreUserManager()
+
+    def __str__(self):
+        return self.email
 
     class Meta:
         verbose_name = _('user')
