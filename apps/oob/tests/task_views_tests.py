@@ -1,9 +1,11 @@
-
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.urls import reverse
 
+from http import HTTPStatus
+
 from apps.oob.models import Task, Project
-from apps.oob.forms import TaskCreateForm
+from apps.oob.forms import TaskForm
 from apps.core.models import CoreUser
 
 
@@ -17,6 +19,7 @@ class TaskIndexViewTest(TestCase):
         test_task_2 = Task.objects.create(title='Task for User2', user=test_user_2)
 
         self.client.login(email='user1@test.com',)
+        
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('task-index'))
         self.assertRedirects(response, reverse('login')+'?next=/oob/task/')
@@ -26,7 +29,7 @@ class TaskIndexViewTest(TestCase):
         response = self.client.get(reverse('task-index'))
 
         self.assertEqual(str(response.context['user']), 'user1@test.com')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
     
     def test_correct_template_used(self):
         self.client.login(email='user1@test.com',password='foo')
@@ -67,7 +70,7 @@ class TaskInboxViewTest(TestCase):
     def test_success_if_logged_in(self):
         response = self.client.get(reverse('inbox'))
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_correct_template_used(self):
         response = self.client.get(reverse('inbox'))
@@ -104,12 +107,12 @@ class TaskDetailViewTest(TestCase):
     def test_user_cannot_view_other_user_task(self):
         response = self.client.get(reverse('task-detail', args=(self.other_user_task.pk,)))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
     def test_user_can_view_task_detail(self):
         response = self.client.get(reverse('task-detail', args=(self.test_task.pk,)))
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         task = response.context['task']
 
@@ -119,6 +122,7 @@ class TaskDetailViewTest(TestCase):
 class TaskCreateViewTest(TestCase):
     
     def setUp(self):
+        self.factory = RequestFactory()
         self.test_user = CoreUser.objects.create(email='user@test.com', password='foo')
         self.test_project = Project.objects.create(title='Test Project', user=self.test_user)
         self.client.force_login(self.test_user)
@@ -127,7 +131,7 @@ class TaskCreateViewTest(TestCase):
         self.client.logout()
 
         response = self.client.get(reverse('task-create'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
     
     def test_post_task_create_view_failure_on_no_login(self):
         
@@ -135,19 +139,22 @@ class TaskCreateViewTest(TestCase):
         response = self.client.post(reverse('task-create'),
                                     data={'title':'Create Test Task'})
         
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_get_task_create_view_form(self):
         response = self.client.get(reverse('task-create'))
         
+        request = self.factory.get(reverse('task-create'))
+        request.user = self.test_user
+        
         test_form = response.context['form']
-        compare_form = TaskCreateForm(self.test_user)
+        compare_form = TaskForm(request=request)
 
         self.assertEqual(test_form.fields.keys(), compare_form.fields.keys())
     
     def test_post_task_create_view(self):
         response = self.client.post(reverse('task-create'),
-                                            data={'title':'Create Test Task'})
+                                    data={'title':'Create Test Task'})
         
         test_task = Task.objects.get()
 
@@ -197,8 +204,9 @@ class TaskUpdateViewTest(TestCase):
 
         response = self.client.get(reverse('task-update', args=(self.test_task.pk,)))
 
-        self.assertEqual(response.status_code, 302)
-
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertRedirects(response, 
+                             reverse('login')+'?next=/oob/task/1/update')
 
     def test_post_task_update_view_no_login(self):
         self.client.logout()
@@ -206,7 +214,7 @@ class TaskUpdateViewTest(TestCase):
         response = self.client.post(reverse('task-update', args=(self.test_task.pk,)),
                                     data={'title':'Final Title'})
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, 
                              reverse('login')+'?next=/oob/task/1/update')
 
@@ -214,7 +222,7 @@ class TaskUpdateViewTest(TestCase):
     def test_get_task_update_view(self):
         response = self.client.get(reverse('task-update', args=(self.test_task.id,)))
         
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, 'oob/task_update.html')
 
 
@@ -233,16 +241,22 @@ class TaskUpdateViewTest(TestCase):
     def test_get_task_update_view_from_other_user(self):
         response = self.client.get(reverse('task-update', args=(self.other_task.pk,)))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
 
-    # def test_post_task_update_view_with_project_update(self):
-    #     response = self.client.post(reverse('task-update', args=(self.test_task.pk,)),
-    #                                 data={'project': self.test_project})
+    def test_post_task_update_view_with_project_update(self):
+        # Populate data with the test_task values. Simulates fetching form data on GET request.
+        data = {
+            'title': self.test_task.title,
+            'body': self.test_task.body,
+            'project': self.test_project.pk,
+        }
+        response = self.client.post(reverse('task-update', args=(self.test_task.pk,)),
+                                    data=data)
         
-    #     self.test_task.refresh_from_db()
+        self.test_task.refresh_from_db()
 
-    #     self.assertEqual(self.test_task.project, self.test_project)
+        self.assertEqual(self.test_task.project, self.test_project)
 
 
 class TaskCompleteViewTest(TestCase):
@@ -293,12 +307,12 @@ class TaskCompleteViewTest(TestCase):
     def test_post_complete_view_forbidden_on_other_user_task(self):
         response = self.client.post(reverse('task-complete', args=(self.other_task.pk,)))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_get_complete_view_forbidden_on_other_user_task(self):
         response = self.client.get(reverse('task-complete', args=(self.other_task.pk,)))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     
 class TaskDeleteViewTest(TestCase):
@@ -307,7 +321,7 @@ class TaskDeleteViewTest(TestCase):
         self.test_user = CoreUser.objects.create(email='user@test.com', password='foo')
         self.other_user = CoreUser.objects.create(email='other@test.com', password='bar')
 
-        self.test_task = Task.objects.create(title='To Be Completed',
+        self.test_task = Task.objects.create(title='To Be Deleted',
                                              user=self.test_user)
         self.other_task = Task.objects.create(title='Other User Task',
                                               user=self.other_user)

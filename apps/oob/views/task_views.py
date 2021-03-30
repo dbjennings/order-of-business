@@ -1,12 +1,13 @@
 from django.http.response import HttpResponseRedirect
-from apps.oob.forms.task_forms import TaskCreateForm
+from apps.oob.forms.task_forms import TaskForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.urls import reverse_lazy
+from django.db.models import Q
 
-from ..models import Task
-from ..mixins import UserIsObjectUserMixIn
+from apps.oob.models import Task
+from apps.oob.mixins import UserIsObjectUserMixIn
 
 
 class TaskIndexView(LoginRequiredMixin, ListView):
@@ -36,13 +37,14 @@ class TaskDetailView(LoginRequiredMixin, UserIsObjectUserMixIn, DetailView):
 
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
-    form_class = TaskCreateForm
+    form_class = TaskForm
     template_name = 'oob/task_create.html'
     success_url = reverse_lazy('task-index')
 
-    def get_form(self):
-        '''Retrieves the form with the current user'''
-        return self.form_class(self.request.user, **self.get_form_kwargs())
+    def get_form_kwargs(self):
+        kwargs = super(TaskCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
     def form_valid(self, form):
         '''Sets the form user to the current user before saving'''
@@ -52,13 +54,23 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         return super(TaskCreateView, self).form_valid(form)
 
 
-class TaskUpdateView(UserIsObjectUserMixIn, UpdateView):
-    model = Task
-    fields = ('title','body','project','completed_on')
+class TaskUpdateView(LoginRequiredMixin,UserIsObjectUserMixIn, UpdateView):
+    form_class = TaskForm
     template_name = 'oob/task_update.html'
     success_url = reverse_lazy('task-index')
     # Extra Parameters
     complete_toggle = False
+
+    def get_queryset(self):
+        '''Manually populate the queryset with only current user data.'''
+        return Task.objects.filter(user=self.request.user)
+
+    def get_form_kwargs(self):
+        '''Appends the view request to the passed kwargs.
+        Used to instatiate TaskForm with current user data.'''
+        kwargs = super(TaskUpdateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
     def post(self, request, *args, **kwargs):
         if self.complete_toggle:
@@ -75,7 +87,17 @@ class TaskUpdateView(UserIsObjectUserMixIn, UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class TaskDeleteView(UserIsObjectUserMixIn, DeleteView):
+class TaskDeleteView(LoginRequiredMixin, UserIsObjectUserMixIn, DeleteView):
     model = Task
     template_name = 'oob/task_delete.html'
     success_url = reverse_lazy('task-index')
+
+
+class TaskSearchView(ListView):
+    template_name = 'oob/search_results.html'
+    
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        if query:
+            query_set = Task.objects.filter(Q(title__icontains=query) | Q(body__icontains=query))
+        return query_set

@@ -1,17 +1,25 @@
-from apps.oob.models import project
-from django.forms import ModelForm, ModelChoiceField
-from ..fields import ProjectChoiceIterator
+from django.forms import ModelForm, Form, CharField
 
 from ..models import Project, Task
 
+class TaskSearchForm(Form):
+    '''Form for the task search bar'''
+    query = CharField(max_length=100)
 
-class TaskCreateForm(ModelForm):
+    query.widget.attrs.update({'placeholder': 'Search all tasks...'})
+
+class TaskForm(ModelForm):
 
     class Meta:
         model = Task
         fields = ('title','body','project',)
 
-    def __init__(self, user, *args, **kwargs):
-        super(TaskCreateForm,self).__init__(*args, **kwargs)
-        self.fields['project'].queryset = Project.objects.filter(user=user)
+    def __init__(self, *args, **kwargs):
+        '''Uses the passed request to populate fields'''
+        if kwargs['request']:
+            self.request = kwargs.pop('request')
+            super(TaskForm,self).__init__(*args, **kwargs)
+            self.fields['project'].queryset = Project.objects.filter(user=self.request.user)
+        else:
+            super(TaskForm,self).__init__(*args, **kwargs)
 

@@ -31,11 +31,6 @@ class Task(models.Model):
 
         if self.title=='':
             raise ValidationError('Task titles must have a non-empty value')
-        
-        # project = self.project
-        # if project is not None:
-        #     if project.user is not self.user:
-        #         raise ValidationError('Tasks can only be added to projects owned by the same user')
 
         if self.completed_on and self.completed_on > timezone.now():
             raise ValueError('Tasks cannot be completed with a future date')

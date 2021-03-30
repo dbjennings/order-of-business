@@ -5,3 +5,5 @@
 <p>Created On: {{ task.created_on }}</p>
 <p>Last Modified On: {{ task.modified_on }}</p>
 <p>Completion Date: {{ task.completed_on|default_if_none:"Not Completed" }}</p>
+<a href="{% url 'task-index' %}">Task Index</a><br/>
+<a href="{% url 'user-home' %}">Home</a>
