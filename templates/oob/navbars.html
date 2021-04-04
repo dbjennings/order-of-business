@@ -1,0 +1,85 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Landing - OoB</title>
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+  
+    <!-- Custom styles for this template -->
+    <link type="text/css" rel="stylesheet" href="{% static 'oob.css' %}">
+  </head>
+
+<body class="h-100">
+<main class="h-100">
+<div class="d-flex flex-column h-100">
+  <header class="nav-oob navbar-dark my-auto align-items-center">
+    <h3 class="float-md-start fw-bolder text-white px-3 mb-0 pt-1">OoB</h3>
+    <nav class="d-flex nav justify-content-between align-items-center me-2 mt-1">
+      <form method="GET" action="{% url 'search' %}" class="input-group w-25 ms-4 mb-1 my-auto">
+        {% csrf_token %}
+        {{ search_form.query }}
+        <!--<input class="form-control" type="text" placeholder="Search tasks...">-->
+        <button class="btn btn-primary text-light" type="submit"><i class="fas fa-search"></i></button>
+      </form>
+      <div class="dropdown my-auto h-100">
+        <a class="text-light" role="button" id="userDropdown" data-bs-toggle="dropdown">
+          <i class="fas fa-user-circle fa-2x my-auto"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <div class="row nav-shadow h-100">
+    <div class="col-md-2 px-4 py-3 bg-dark h-100">
+      <ul class="list-group list-group-flush list-unstyled ps-2">
+        <li class="mb-1">
+          <a href="{% url 'user-home' %}" class="nav-link text-light fs-5">
+            <i class="fas fa-fw fa-home me-2"></i>Home</a>
+        </li>
+        <li class="mb-1">
+          <a href="{% url 'inbox' %}" class="nav-link text-light fs-5">
+            <i class="far fa-fw fa-envelope me-2"></i>Inbox
+            <span class="badge bg-primary rounded-pill ms-2">{{ inbox_count }}</span>
+          </a>
+        </li>
+        <li class="mb-1">
+          <button class="btn align-items-center rounded text-light fs-5 pb-2" data-bs-toggle="collapse" data-bs-target="#projects-collapse">
+            <i class="fas fa-fw fa-project-diagram me-2"></i>Projects
+          </button>
+          <div class="collapse" id="projects-collapse">
+            <ul class="list-group fa-ul btn-toggle-nav fw-normal my-2">
+              {% for project in user_projects %}
+                <li class="list-group-item list-group-item-dark list-group-item-action">
+                  <span class="fa-li"><i class="fas fa-tasks text-light"></i></span>
+                  <a href="{% url 'project-detail' project.pk %}" 
+                     class="link-dark text-decoration-none stretched-link fs-6 fw-light ms-1">
+                     {{ project.title|truncatechars:20 }}</a>
+                </li>            
+              {% endfor %}
+              <li class="list-group-item list-group-item-dark list-group-item-action">
+                <span class="fa-li"><i class="far fa-plus-square text-light"></i></span>
+                <a href="{% url 'project-create' %}" class="link-dark text-decoration-none stretched-link fs-6 fw-light ms-1">Add New Project</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-10 bg-oob nav-shadow h-100">
+      {% block content %}{% endblock content %}
+    </div>
+  </div>
+</main>
+
+
+
+  <script src="{% static 'bootstrap.bundle.js' %}"></script>
+  <script src="https://kit.fontawesome.com/16ec204204.js" crossorigin="anonymous"></script>
+  </body>
+</html>

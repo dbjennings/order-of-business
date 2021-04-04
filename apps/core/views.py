@@ -2,9 +2,10 @@ from django.contrib.auth import authenticate, login
 from django.http.response import HttpResponseRedirect
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import CreateView, FormMixin
 
-from .forms import CoreAuthenticationForm, CoreUserAddForm
+from apps.core.forms import CoreAuthenticationForm, CoreUserAddForm
 
 class CoreLoginView(LoginView):
 
@@ -17,16 +18,15 @@ class CoreRegisterView(CreateView):
     template_name = 'core/register.html'
     form_class = CoreUserAddForm
     success_url = reverse_lazy('landing')
-    redirect_authenticated_user = True
-
+    
     def dispatch(self, request, *args, **kwargs):
         '''Redirects to User's Home if already authenticated'''
 
         # Check for redirect and authenticated user
-        if self.redirect_authenticated_user and self.request.user.is_authenticated:
+        if self.request.user.is_authenticated:
             
             # Redirect to the user's home page
-            redirect_to = reverse_lazy('landing')
+            redirect_to = reverse_lazy('user-home')
             return HttpResponseRedirect(redirect_to)
 
         return super().dispatch(request, *args, **kwargs)
@@ -45,3 +45,22 @@ class CoreRegisterView(CreateView):
         login(self.request, new_user)
 
         return HttpResponseRedirect(self.get_success_url())
+
+class CoreLandingView(FormMixin, TemplateView):
+    template_name = 'core/landing.html'
+    form_class = CoreUserAddForm
+
+
+    def dispatch(self, request, *args, **kwargs):
+        '''Redirects to User's Home if already authenticated'''
+
+        # Check for redirect and authenticated user
+        if self.request.user.is_authenticated:
+            
+            # Redirect to the user's home page
+            redirect_to = reverse_lazy('user-home')
+            return HttpResponseRedirect(redirect_to)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    

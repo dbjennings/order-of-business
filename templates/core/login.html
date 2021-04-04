@@ -1,5 +1,72 @@
-<form method="POST" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
+{% load static %}
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - OoB</title>
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+  
+    <!-- Custom styles for this template -->
+    <link type="text/css" rel="stylesheet" href="{% static 'login_register.css' %}">
+  </head>
+
+<body class="h-100 w-100 overflow-hidden">
+    
+<div class="d-flex flex-column bg-img w-100 h-100">
+  <header class="nav-oob navbar-dark my-auto">
+    <div>
+      <h3 class="float-md-start fw-bolder px-3 mb-0 pt-1">OoB</h3>
+      <nav class="nav nav-masthead justify-content-center float-md-end">
+        <div class="dropdown">
+          <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Contact
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="mailto:dbjennings@gmail.com"><i class="fas fa-envelope-square"></i>&nbsp;E-Mail</a></li>
+            <li><a class="dropdown-item" href="https://www.linkedin.com/in/david-jennings-2024a357/"><i class="fab fa-linkedin"></i>&nbsp;LinkedIn</a></li>
+            <li><a class="dropdown-item" href="https://github.com/dbjennings"><i class="fab fa-github-square"></i>&nbsp;GitHub</a></li>
+          </ul>
+        </div>
+        <a class="nav-link text-light" href="{% url 'register' %}">Sign Up</a>
+        <a class="nav-link text-light" href="{% url 'login' %}">Log In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="bg-oob h-100 nav-shadow">
+    <div class="row h-100">
+        <div class="col d-flex justify-content-center align-items-center">
+            <div class="card l-card">
+                <h2 class="text-center text-shadow pt-4">Welcome back!</h2>
+                <form method="POST" class="text-center d-flex flex-column justify-content-around align-items-center h-100 w-100">
+                    {% csrf_token %}
+                    <div class="w-100">
+                    <div class="form-floating my-2 mx-2">
+                      {{ form.username }}
+                      <label for="email" class="text-dark">E-Mail</label>
+                    </div>
+                    <div class="form-floating my-2 mx-2">
+                      {{ form.password }}
+                      <label for="password" class="text-dark">Password</label>
+                    </div>
+                    {% for error, msg in form.errors.items %}
+                      {% if forloop.first %}
+                        <p class="text-warning">{{ msg|striptags }}</p>
+                      {% endif %}
+                    {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-primary border border-dark justify-self-end w-75">Log In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+  </main>
+</div>
+
+
+  <script src="{% static 'bootstrap.bundle.js' %}"></script>
+  <script src="https://kit.fontawesome.com/16ec204204.js" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,11 +1,9 @@
-<h1>Welcome back, {{ request.user.email }}!</h1>
-<span><a href="{% url 'task-index' %}">Tasks</a>: {{ tasks|length }}</span>
-<br/>
-<span><a href="{% url 'project-index' %}">Projects</a>: {{ projects|length }}</span>
-{% for group in request.user.groups.all %}
-<p>{{ group.name }}</p>
-{% endfor %}
-<form method="GET" action="{% url 'search' %}">
-    {{ search_form.query }}
-    <button type="submit">Search</button>
-</form>
+{% extends 'oob/navbars.html' %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center mt-3">
+    <h1>Welcome back, {{ request.user.name }}!</h1>
+    <br/>
+    <h3 class="text-muted">More to come for the user page...</h3>
+</div>
+{% endblock %}

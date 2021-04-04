@@ -1,13 +1,13 @@
 from django.urls import path
 from django.urls.conf import include
+from django.views.generic.base import TemplateView
 
 from apps.oob.views import TaskIndexView, TaskDetailView, TaskCreateView, TaskUpdateView, TaskDeleteView, TaskSearchView
 from apps.oob.views import ProjectUpdateView, ProjectCreateView, ProjectDetailView, ProjectIndexView, ProjectDeleteView
-from apps.oob.views import UserHomeView
 
 
 urlpatterns = [
-    path('', UserHomeView.as_view(), name='user-home'),
+    path('', TemplateView.as_view(template_name='oob/user_home.html'), name='user-home'),
     path('search/', TaskSearchView.as_view(), name='search'),
     path('task/', include([
         path('', TaskIndexView.as_view(), name='task-index'),

@@ -15,6 +15,10 @@ class CoreUser(AbstractUser):
 
     objects = CoreUserManager()
 
+    @property
+    def first_name(self):
+        return self.name.split(' ')[0]
+
     def __str__(self):
         return self.email
 

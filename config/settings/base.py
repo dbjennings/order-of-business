@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.oob.context_processors.user_context.user_context',
             ],
         },
     },
@@ -132,10 +133,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = str(ROOT_DIR.path('staticfiles'))
+STATIC_ROOT = str(ROOT_DIR.path('static'))
 
 STATICFILES_DIRS = (
-    str(ROOT_DIR.path('static').path('app')),
+    str(ROOT_DIR.path('static').path('image')),
     str(ROOT_DIR.path('static').path('css')),
     str(ROOT_DIR.path('static').path('js')),
 )
