@@ -1,3 +1,6 @@
+{% extends 'oob/navbars.html' %}
+
+{% block content %}
 <table>
     <tr>
         <th>Title</th>
@@ -31,3 +34,4 @@
 
 <a href="{% url 'task-create' %}">Create Task</a><br/>
 <a href="{% url 'user-home' %}">Home</a>
+{% endblock %}

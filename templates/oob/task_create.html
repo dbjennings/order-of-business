@@ -1,3 +1,6 @@
+{% extends 'oob/navbars.html' %}
+
+{% block content %}
 <form method="POST" action="">
     {% csrf_token %}
     {{ form.as_p }}
@@ -5,3 +8,4 @@
 </form>
 <a href="{% url 'task-index' %}">Task Index</a><br/>
 <a href="{% url 'user-home' %}">Home</a>
+{% endblock %}

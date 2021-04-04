@@ -1,6 +1,10 @@
+{% extends 'oob/navbars.html' %}
+
+{% block content %}
 <h1>Are you sure you want to delete {{ project.title }}?</h1>
 <form method="POST" action="">
     {% csrf_token %}
     <a href="{% url 'project-index' %}">Cancel</a>
     <button type="submit">Confirm</button>
 </form>
+{% endblock %}

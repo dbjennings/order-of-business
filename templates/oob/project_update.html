@@ -1,3 +1,6 @@
+{% extends 'oob/navbars.html' %}
+
+{% block content %}
 <h1>Update Project</h1>
 <form method="POST" action="">
     {% csrf_token %}
@@ -6,3 +9,4 @@
 </form>
 <a href="{% url 'project-index' %}">Project Index</a><br/>
 <a href="{% url 'user-home' %}">Home</a>
+{% endblock %}
