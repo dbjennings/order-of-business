@@ -1,30 +1,23 @@
 {% extends 'oob/navbars.html' %}
 
 {% block content %}
-<table>
-    <tr>
-        <th>Project Name</th>
-        <th>Description</th>
-        <th># of Tasks</th>
-        <th>Parent Project</th>
-        <th>Created By</th>
-        <th>Completed On</th>
-        <th></th>
-        <th></th>
-    </tr>
-    {% for project in projects %}
-    <tr>
-        <td><a href="{% url 'project-detail' project.pk %}">{{ project.title }}</td>
-        <td>{{ project.body }}</td>
-        <td>{{ project.tasks.all|length }}</td>
-        <td>{{ project.parent }}</td>
-        <td>{{ project.user }}</td>
-        <td>{{ project.completed_on|default_if_none:'Incomplete' }}</td>
-        <td><a href="{% url 'project-update' project.pk %}">Update</a></td>
-        <td><a href="{% url 'project-delete' project.pk %}">Delete</td>
-    </tr>
-    {% endfor %}
-</table>
-<a href="{% url 'project-create' %}">Create New Project</a><br/>
-<a href="{% url 'user-home' %}">Home</a>
+<h1 class="text-center py-4">Project List</h1>
+<ul class="list-group px-3">
+  {% for project in projects %}
+    <li class="list-group-item d-inline-flex align-items-center justify-content-between">
+        <div class="d-flex d-inline-flex align-items-center">
+          <a class="text-decoration-none mx-2" href="{% url 'project-detail' project.pk %}">{{ project.title }}</a>
+        </div>
+        <div class="dropdown">
+        <button class="btn btn-secondary" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-fw fa-tasks text-light"></i>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="{% url 'project-update' project.pk %}">Edit</a></li>
+            <li><a class="dropdown-item" href="{% url 'project-delete' project.pk %}">Delete</a></li>
+        </ul>
+        </div>
+    </li>
+  {% endfor %}
+</ul>
 {% endblock %}

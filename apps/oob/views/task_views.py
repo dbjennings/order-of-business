@@ -1,4 +1,5 @@
 from django.http.response import HttpResponseRedirect
+from django.views.generic.base import ContextMixin
 from apps.oob.forms.task_forms import TaskForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -24,6 +25,10 @@ class TaskIndexView(LoginRequiredMixin, ListView):
                                        project=None)
         else:
             return Task.objects.filter(user=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        self.extra_context = {'inbox': self.inbox_view}
+        return super(TaskIndexView, self).get_context_data(**kwargs)
 
 
 class TaskDetailView(LoginRequiredMixin, UserIsObjectUserMixIn, DetailView):

@@ -1,13 +1,19 @@
 {% extends 'oob/navbars.html' %}
 
 {% block content %}
-<h1>{{ task.title }}</h1>
-<h3>{{ task.body }}</h3>
-<p>Project: {{ task.project }}</p>
-<p>Created By: {{ task.user }}</p>
-<p>Created On: {{ task.created_on }}</p>
-<p>Last Modified On: {{ task.modified_on }}</p>
-<p>Completion Date: {{ task.completed_on|default_if_none:"Not Completed" }}</p>
-<a href="{% url 'task-index' %}">Task Index</a><br/>
-<a href="{% url 'user-home' %}">Home</a>
+<div class="d-flex justify-content-center align-items-center h-100">
+  <div class="card project-card px-5" style="height: 14rem;">
+    <h1 class="text-light pt-3">{{task.title}}</h2>
+    <h5 class="text-light">{{task.body}}</h5>
+    <h5 class="text-light">Project: {{task.project}}</h5>
+    <h5 class="text-light">Created On: {{task.created_on}}</h5>
+    <h5 class="text-light">Completed?
+      {% if task.is_complete %}
+        <i class="fas fa-check text-success"></i>
+      {% else %}
+        <i class="fas fa-times-circle text-danger"></i>
+      {% endif %}
+    </p>
+  </div>
+</div>
 {% endblock %}

@@ -26,3 +26,14 @@ class ProjectForm(ModelForm):
             self.fields['parent'].queryset = query_set
         else:
             super(ProjectForm,self).__init__(*args, **kwargs)
+
+        self.fields['title'].widget.attrs.update({'class': 'form-control border border-dark',
+                                                  'placeholder': 'Title',
+                                                  'id': 'projectTitle',})
+        self.fields['body'].widget.attrs.update({'class': 'form-control border border-dark',
+                                                 'placeholder': 'Body',
+                                                 'id': 'projectBody',
+                                                 'style': 'height: 8rem;',})
+        self.fields['parent'].widget.attrs.update({'class': 'form-select border border-dark',
+                                                   'placeholder': 'Parent',
+                                                   'id': 'projectParent',})

@@ -24,3 +24,14 @@ class TaskForm(ModelForm):
         else:
             super(TaskForm,self).__init__(*args, **kwargs)
 
+        self.fields['title'].widget.attrs.update({'class': 'form-control border border-dark',
+                                                  'placeholder': 'Title',
+                                                  'id': 'taskTitle',})
+        self.fields['body'].widget.attrs.update({'class': 'form-control border border-dark',
+                                                 'placeholder': 'Body',
+                                                 'id': 'taskBody',
+                                                 'style': 'height: 8rem;',})
+        self.fields['project'].widget.attrs.update({'class': 'form-select border border-dark',
+                                                   'placeholder': 'Project',
+                                                   'id': 'taskProject',})
+

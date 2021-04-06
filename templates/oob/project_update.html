@@ -1,12 +1,28 @@
 {% extends 'oob/navbars.html' %}
 
 {% block content %}
-<h1>Update Project</h1>
-<form method="POST" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-</form>
-<a href="{% url 'project-index' %}">Project Index</a><br/>
-<a href="{% url 'user-home' %}">Home</a>
-{% endblock %}
+<div class="d-flex justify-content-center align-items-center h-100">
+  <div class="card project-card">
+    <h1 class="text-light text-center my-3">Edit Project</h1>
+    <form class=""method="POST" action="">
+      {% csrf_token %}
+      <div class="form-floating mb-3 mx-3">
+        {{ form.title }}
+        <label for="projectTitle">Project Name</label>
+      </div>
+      <div class="form-floating mb-3 mx-3">
+        {{ form.body }}
+        <label for="projectBody">Description</label>
+      </div>
+      <div class="form-floating mb-3 mx-3">
+        {{ form.parent }}
+        <label for="projectParent">Parent Project (if this is a Sub-Project)</label>
+      </div>
+      <div class="d-grid gap-2 col-8 mx-auto">
+        <button class="btn btn-lg btn-primary" type="submit">Create</button>
+        <a class="btn btn-lg btn-danger"href="{% url 'project-index' %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

@@ -24,19 +24,25 @@
         <!--<input class="form-control" type="text" placeholder="Search tasks...">-->
         <button class="btn btn-primary text-light" type="submit"><i class="fas fa-search"></i></button>
       </form>
-      <div class="dropdown my-auto h-100">
-        <a class="text-light" role="button" id="userDropdown" data-bs-toggle="dropdown">
-          <i class="fas fa-user-circle fa-2x my-auto"></i>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-        </ul>
+      <div class="d-inline-flex align-items-center">
+        <button type="button" class="btn btn-primary mx-4" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <i class="fas fa-plus"></i>
+        </button>
+
+        <div class="dropdown my-auto h-100">
+          <a class="text-light" role="button" id="userDropdown" data-bs-toggle="dropdown">
+            <i class="fas fa-user-circle fa-2x my-auto"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
   </header>
 
   <div class="row nav-shadow h-100">
-    <div class="col-md-2 px-4 py-3 bg-dark h-100">
+    <div class="col-md-3 px-4 py-3 bg-dark h-100">
       <ul class="list-group list-group-flush list-unstyled ps-2">
         <li class="mb-1">
           <a href="{% url 'user-home' %}" class="nav-link text-light fs-5">
@@ -49,21 +55,32 @@
           </a>
         </li>
         <li class="mb-1">
-          <button class="btn align-items-center rounded text-light fs-5 pb-2" data-bs-toggle="collapse" data-bs-target="#projects-collapse">
+          <button class="btn dropdown-toggle align-items-center rounded text-light fs-5 pb-2" data-bs-toggle="collapse" data-bs-target="#projects-collapse">
             <i class="fas fa-fw fa-project-diagram me-2"></i>Projects
           </button>
-          <div class="collapse" id="projects-collapse">
+          <div class="collapse show" id="projects-collapse">
             <ul class="list-group fa-ul btn-toggle-nav fw-normal my-2">
               {% for project in user_projects %}
                 <li class="list-group-item list-group-item-dark list-group-item-action">
-                  <span class="fa-li"><i class="fas fa-tasks text-light"></i></span>
+                  <span class="fa-li m-n2 my-0">
+                    <div class="dropdown">
+                      <button class="btn btn-secondary p-0" type="button" id="projectDD{{ forloop.counter}}" data-bs-toggle="dropdown">
+                        <i class="fas fa-fw fa-tasks text-light"></i>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'project-update' project.pk %}">Edit</a></li>
+                        <li><a class="dropdown-item" href="{% url 'project-delete' project.pk %}">Delete</a></li>
+                      </ul>
+                    </div>
+                  </span>
                   <a href="{% url 'project-detail' project.pk %}" 
                      class="link-dark text-decoration-none stretched-link fs-6 fw-light ms-1">
                      {{ project.title|truncatechars:20 }}</a>
                 </li>            
               {% endfor %}
               <li class="list-group-item list-group-item-dark list-group-item-action">
-                <span class="fa-li"><i class="far fa-plus-square text-light"></i></span>
+                <span class="fa-li m-n2 my-0">
+                  <button class="btn btn-secondary p-0" onclick="window.location.href='{% url 'project-create' %}'"><i class="far fa-fw fa-plus-square text-light"></i></button></span>
                 <a href="{% url 'project-create' %}" class="link-dark text-decoration-none stretched-link fs-6 fw-light ms-1">Add New Project</a>
               </li>
             </ul>
@@ -71,10 +88,41 @@
         </li>
       </ul>
     </div>
-    <div class="col-md-10 bg-oob nav-shadow h-100">
+    <div class="col-md-9 bg-oob nav-shadow h-100">
       {% block content %}{% endblock content %}
     </div>
   </div>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add New Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="{% url 'task-create' %}">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="form-floating mb-3 mx-3">
+              {{ task_form.title }}
+              <label for="projectBody">Task</label>
+            </div>          
+            <div class="form-floating mb-3 mx-3">
+              {{ task_form.body }}
+              <label for="projectBody">Description</label>
+            </div>
+            <div class="form-floating mb-3 mx-3">
+              {{ task_form.project }}
+              <label for="projectBody">Project</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
 </main>
 
 

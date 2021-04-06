@@ -1,7 +1,39 @@
 {% extends 'oob/navbars.html' %}
 
 {% block content %}
-{% for result in object_list %}
-<p>{{ result.title }}</p>
-{% endfor %}
+{% if inbox %}
+  <h1 class="text-center py-4">Inbox</h1>
+{% else %}
+  <h1 class="text-center py-4">Task List</h1>
+{% endif %}
+
+<ul class="list-group px-3">
+  {% for task in object_list %}
+    {% if not task.is_complete %}
+    <li class="list-group-item d-inline-flex align-items-center justify-content-between">
+      <div class="d-flex d-inline-flex align-items-center">
+        <form id="complete{{ forloop.counter }}" method="POST" action="{% url 'task-complete' task.pk %}">
+          {% csrf_token %}
+          <a href="javascript:{}" class="text-dark" onclick="document.getElementById('complete{{ forloop.counter }}').submit();">
+            <span class="fa-layers fa-fw">
+              <i class="far fa-circle fa-lg circle-show"></i>
+              <i class="far fa-check-circle fa-lg check-hide"></i>
+            </span>
+          </a>
+        </form>
+        <a class="text-decoration-none mx-2" href="{% url 'task-detail' task.pk %}">{{ task.title }}</a>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-secondary" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-fw fa-tasks text-light"></i>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" href="{% url 'task-update' task.pk %}">Edit</a></li>
+          <li><a class="dropdown-item" href="{% url 'task-delete' task.pk %}">Delete</a></li>
+        </ul>
+      </div>
+    </li>
+  {% endif %}
+  {% endfor %}
+</ul>
 {% endblock %}

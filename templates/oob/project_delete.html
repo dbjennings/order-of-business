@@ -1,10 +1,15 @@
 {% extends 'oob/navbars.html' %}
 
 {% block content %}
-<h1>Are you sure you want to delete {{ project.title }}?</h1>
-<form method="POST" action="">
-    {% csrf_token %}
-    <a href="{% url 'project-index' %}">Cancel</a>
-    <button type="submit">Confirm</button>
-</form>
+<div class="d-flex justify-content-center align-items-center h-100">
+  <div class="card d-flex flex-column justify-content-around project-delete-card text-center">
+    <h1 class="text-light">Are you sure you want to delete the following?</h1>
+    <a class="nav-link text-warning fs-2" href={% url 'project-detail' project.pk %}>{{ project.title }}</a>
+    <form class="w-100" method="POST" action="">
+        {% csrf_token %}
+        <a class="btn btn-lg btn-danger w-25" href="{% url 'project-index' %}">Cancel</a>
+        <button class="btn btn-lg btn-success w-25" type="submit">Confirm</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

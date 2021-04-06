@@ -1,21 +1,116 @@
 {% extends 'oob/navbars.html' %}
 
 {% block content %}
-<h1>Project: {{ project.title }}</h1>
-<h2 style="color: #777;">{{ project.body }}</h2>
-<br>
-<h3>Top Level Tasks<h3>
-{% for task in project.tasks.all %}
-<p>{{ task.title }}</p>
-{% endfor %}
-<br>
-{% for child in project.children.all %}
-<h3>Sub-Project:{{ child.title }}</h3>
-{% for task in child.tasks.all %}
-<p>{{ task.title }}</p>
-{% endfor %}
-<br>
-{% endfor %}
-<a href="{% url 'project-index' %}">Project Index</a><br/>
-<a href="{% url 'user-home' %}">Home</a>
+<div class="d-flex flex-column">
+  <p class="display-4 mx-4 my-3">{{ project.title }}</h1>
+  <p class="display-6 text-secondary">{{ project.body }}</h3>
+  <div class="accordion accordion-flush mx-4" id="projectAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMain">
+            Project Tasks
+        </button>
+      </h2>
+      <div id="collapseMain" class="accordion-collapse collapse show" data-bs-parent="#projectAccordian">
+        
+        {% for task in project.tasks.all %}
+        {% if not task.is_complete %}
+          <div class="accordion-body d-flex flex-row justify-content-between">
+            <div class="d-inline-flex align-items-center">
+              <form id="complete{{ forloop.counter }}" method="POST" action="{% url 'task-complete' task.pk %}">
+                {% csrf_token %}
+                <a href="javascript:{}" class="text-dark" onclick="document.getElementById('complete{{ forloop.counter }}').submit();">
+                  <span class="fa-layers fa-fw">
+                    <i class="far fa-circle fa-lg circle-show"></i>
+                    <i class="far fa-check-circle fa-lg check-hide"></i>
+                  </span>
+                </a>
+              </form>
+              <span class="mx-2">{{ task.title }}</span>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-secondary" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-fw fa-tasks text-light"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="{% url 'task-update' task.pk %}">Edit</a></li>
+                <li><a class="dropdown-item" href="{% url 'task-delete' task.pk %}">Delete</a></li>
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+        <hr/>
+        {% endfor %}
+
+        <div class="accordion-body w-100">
+          <form class="w-100" method="POST" action="{% url 'task-create' %}">
+            {% csrf_token %}
+            <div class="input-group d-flex flex-row">
+              <div class="form-floating col">
+                {{ task_form.title }}
+                <label for="">New Task</label>
+              </div>
+              <button class="btn btn-primary px-5" type="submit">Add</button>
+              <input type="hidden" name="project" value="{{ project.pk }}">
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+    {% for sub in project.children.all %}
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSub{{ forloop.counter }}" aria-expanded="false" aria-controls="flush-collapseTwo">
+            {{ sub.title }}
+        </button>
+      </h2>
+
+      <div id="collapseSub{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#projectAccordian">
+        
+        {% for task in sub.tasks.all %}
+        {% if not task.is_complete %}
+          <div class="accordion-body d-flex flex-row justify-content-between">
+            <div class="d-inline-flex align-items-center">
+              <form id="complete{{ forloop.counter }}" method="POST" action="{% url 'task-complete' task.pk %}">
+                {% csrf_token %}
+                <a href="javascript:{}" class="text-dark" onclick="document.getElementById('complete{{ forloop.counter }}').submit();">
+                  <span class="fa-layers fa-fw">
+                    <i class="far fa-circle fa-lg circle-show"></i>
+                    <i class="far fa-check-circle fa-lg check-hide"></i>
+                  </span>
+                </a>
+              </form>
+              <span class="mx-2">{{ task.title }}</span>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-secondary" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-fw fa-tasks text-light"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="{% url 'task-update' task.pk %}">Edit</a></li>
+                <li><a class="dropdown-item" href="{% url 'task-delete' task.pk %}">Delete</a></li>
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+        <hr/>
+        {% endfor %}
+        <div class="accordion-body w-100">
+          <form class="w-100" method="POST" action="{% url 'task-create' %}">
+            {% csrf_token %}
+            <div class="input-group d-flex flex-row">
+              <div class="form-floating col">
+                {{ task_form.title }}
+                <label for="">New Task</label>
+              </div>
+              <button class="btn btn-primary px-5" type="submit">Add</button>
+              <input type="hidden" name="project" value="{{ sub.pk }}">
+            </div>
+          </form>
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
